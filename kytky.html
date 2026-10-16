@@ -10,11 +10,12 @@
             background: linear-gradient(to bottom, #d4fc79 0%, #96e6a1 100%);
             text-align: center;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            height: 94vh;
+            justify-content: flex-start;
+            gap: 8px;
+            height: 88vh; /* Zkráceno, aby vše vyjelo výš před lištu Netlify */
             user-select: none;
             overflow: hidden;
         }
@@ -23,46 +24,47 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 8px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 6px 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            margin: 5px 10px 0 10px;
         }
         h1 {
             color: #2c3e50;
-            font-size: 1.1rem;
+            font-size: 1.0rem;
             margin: 0;
         }
         .bouquet-preview {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             background: #fff3cd;
-            padding: 4px 10px;
-            border-radius: 10px;
+            padding: 3px 8px;
+            border-radius: 8px;
             border: 2px dashed #ffecb5;
         }
-        /* Hlavní herní plocha */
+        /* Hlavní herní plocha - posunuta výš a zkompaktněna */
         .game-card {
             background: white;
-            border-radius: 25px;
-            padding: 15px;
+            border-radius: 20px;
+            padding: 10px 15px;
             width: 92%;
             max-width: 450px;
             margin: 0 auto;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         .speaker-btn {
             background: #ff6b6b;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            font-size: 2.2rem;
+            width: 55px;
+            height: 55px;
+            font-size: 1.8rem;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,7 +73,7 @@
         .speaker-btn:active { transform: scale(0.9); }
         
         .hint-text {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #666;
             margin: 0;
         }
@@ -80,20 +82,20 @@
         .slot-container {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            min-height: 55px;
-            margin: 5px 0;
+            gap: 6px;
+            min-height: 45px;
+            margin: 2px 0;
             flex-wrap: wrap;
         }
         .letter-slot {
-            width: 45px;
-            height: 50px;
+            width: 40px;
+            height: 45px;
             border: 3px dashed #4dabf7;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #333;
             background: #f8f9fa;
@@ -110,25 +112,25 @@
         .pool-container {
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
-            margin-top: 5px;
+            margin-top: 2px;
         }
         .letter-tile {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: #fab005;
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             transition: transform 0.1s, opacity 0.2s;
-            border-bottom: 4px solid #e67700;
+            border-bottom: 3px solid #e67700;
         }
         .letter-tile:active {
             transform: scale(0.9);
@@ -141,8 +143,8 @@
         }
 
         .message {
-            font-size: 1.2rem;
-            height: 25px;
+            font-size: 1.1rem;
+            height: 22px;
             font-weight: bold;
             color: #2b8a3e;
         }
@@ -177,16 +179,17 @@
         .hidden { display: none !important; }
         .back-link {
             position: absolute;
-            top: 10px;
+            top: 8px;
             left: 10px;
             background: white;
-            padding: 6px 12px;
-            border-radius: 10px;
+            padding: 4px 10px;
+            border-radius: 8px;
             text-decoration: none;
             color: #333;
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            z-index: 5;
         }
     </style>
 </head>
@@ -199,7 +202,7 @@
         <h2>🌸 Trhání kytek 🌸</h2>
         <p id="overlayText">Poskládej slova, utrhni kytičky a postav ten nejkrásnější puget pro maminku nebo tety!</p>
         <div class="big-bouquet" id="overlayEmoji">🌷🌻🌹</div>
-        <button class="btn" id="overlayBtn" onclick="startGame()">Zaít hrát</button>
+        <button class="btn" id="overlayBtn" onclick="startGame()">Začít hrát</button>
     </div>
 
     <header>
@@ -221,7 +224,6 @@
     </div>
 
     <script>
-        // Velká zásoba slov pro prvňáčky
         const wordsList = [
             "PES", "KOČKA", "MÁMA", "TÁTA", "STROM", "LIST", 
             "DŮM", "AUTO", "KOLO", "KVĚT", "SLUNCE", "VODA", 
@@ -233,8 +235,8 @@
         const totalRounds = 5;
         let activeWord = "";
         let collectedFlowers = [];
-        let currentSlots = []; // drží info, co je v jednotlivých políčkách
-        let poolLetters = [];  // všechna písmena na výběr
+        let currentSlots = [];
+        let poolLetters = [];
 
         const overlayEl = document.getElementById('overlayScreen');
         const overlayTitleEl = overlayEl.querySelector('h2');
@@ -255,152 +257,3 @@
             overlayEl.classList.add('hidden');
             nextRound();
         }
-
-        function nextRound() {
-            messageEl.textContent = "";
-            
-            // Vyber náhodné slovo
-            activeWord = wordsList[Math.floor(Math.random() * wordsList.length)];
-            
-            // Inicializuj políčka
-            currentSlots = new Array(activeWord.length).fill(null);
-
-            // Připrav písmena pro Logo Quiz (správná + 2-3 špatná navíc)
-            let correctLetters = activeWord.split('');
-            let alphabet = "ABCČDEFGHIJKLMNOPRSŠTUVXYZŽ";
-            let wrongCount = activeWord.length <= 3 ? 2 : 3;
-            let wrongLetters = [];
-
-            while(wrongLetters.length < wrongCount) {
-                let randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
-                if (!correctLetters.includes(randomChar) && !wrongLetters.includes(randomChar)) {
-                    wrongLetters.push(randomChar);
-                }
-            }
-
-            // Spoj a zamíchej
-            poolLetters = [...correctLetters, ...wrongLetters];
-            poolLetters.sort(() => Math.random() - 0.5);
-
-            renderGame();
-            speakWord();
-        }
-
-        function renderGame() {
-            // Aktualizuj puget v hlavičce
-            bouquetPreviewEl.textContent = collectedFlowers.join(" ");
-
-            // Vykresli sloty pro slovo
-            slotContainerEl.innerHTML = "";
-            currentSlots.forEach((letter, index) => {
-                const slot = document.createElement('div');
-                slot.classList.add('letter-slot');
-                if (letter) {
-                    slot.classList.add('filled');
-                    slot.textContent = letter;
-                    slot.onclick = () => removeFromSlot(index);
-                } else {
-                    slot.textContent = "";
-                }
-                slotContainerEl.appendChild(slot);
-            });
-
-            // Vykresli výběr písmen
-            poolContainerEl.innerHTML = "";
-            poolLetters.forEach((item, poolIndex) => {
-                const tile = document.createElement('div');
-                tile.classList.add('letter-tile');
-                tile.textContent = item.letter || item;
-                
-                // Zkontroluj, jestli už je tato dlaždice použitá
-                if (item.used) {
-                    tile.classList.add('used');
-                } else {
-                    tile.onclick = () => selectTile(poolIndex);
-                }
-                poolContainerEl.appendChild(tile);
-            });
-        }
-
-        function speakWord() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                let utterance = new SpeechSynthesisUtterance(activeWord);
-                utterance.lang = 'cs-CZ';
-                utterance.rate = 0.75; // Pomaleji pro prvňáčky
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function selectTile(poolIndex) {
-            // Najdi první prázdný slot
-            let emptyIndex = currentSlots.indexOf(null);
-            if (emptyIndex !== -1) {
-                currentSlots[emptyIndex] = poolLetters[poolIndex];
-                poolLetters[poolIndex] = { letter: poolLetters[poolIndex], used: true, poolId: poolIndex };
-                
-                renderGame();
-
-                // Zkontroluj, jestli už je vyplněno celé slovo
-                if (!currentSlots.includes(null)) {
-                    checkAnswer();
-                }
-            }
-        }
-
-        function removeFromSlot(slotIndex) {
-            let removedLetter = currentSlots[slotIndex];
-            if (removedLetter) {
-                // Vrať písmeno zpět do výběru
-                if (typeof removedLetter === 'object') {
-                    poolLetters[removedLetter.poolId].used = false;
-                } else {
-                    // Najdi odpovídající nepoužitou dlaždici v poolu
-                    let tileObj = poolLetters.find(p => (p === removedLetter || p.letter === removedLetter) && p.used);
-                    if (tileObj) tileObj.used = false;
-                }
-                currentSlots[slotIndex] = null;
-                renderGame();
-            }
-        }
-
-        function checkAnswer() {
-            // Slož slovo ze slotů
-            let formedWord = currentSlots.map(s => typeof s === 'object' ? s.letter : s).join('');
-
-            if (formedWord === activeWord) {
-                messageEl.textContent = "Správně! Utrhla jsi kytičku! 🌸";
-                
-                // Přidej náhodnou kytku do pugetu
-                let randomFlower = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
-                collectedFlowers.push(randomFlower);
-
-                setTimeout(() => {
-                    if (currentRound < totalRounds) {
-                        currentRound++;
-                        nextRound();
-                    } else {
-                        showFinalVictory();
-                    }
-                }, 1200);
-            } else {
-                messageEl.style.color = '#e03131';
-                messageEl.textContent = "Takhle to úplně nesedí, zkus to upravit! 🙈";
-                setTimeout(() => {
-                    messageEl.style.color = '#2b8a3e';
-                    messageEl.textContent = "";
-                }, 1500);
-            }
-        }
-
-        function showFinalVictory() {
-            overlayEl.classList.remove('hidden');
-            overlayTitleEl.textContent = "🏆 Úžasné! Máš hotový puget!";
-            overlayTextEl.textContent = `Zvládla jsi všech ${totalRounds} kol a nasbírala nádherné kytičky!`;
-            overlayEmojiEl.textContent = collectedFlowers.join(" ");
-            overlayBtnEl.textContent = "Hrát znovu";
-        }
-    </script>
-
-</body>
-</html>
