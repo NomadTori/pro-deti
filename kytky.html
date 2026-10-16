@@ -15,7 +15,7 @@
             flex-direction: column;
             justify-content: flex-start;
             gap: 8px;
-            height: 88vh; /* Zkráceno, aby vše vyjelo výš před lištu Netlify */
+            height: 88vh;
             user-select: none;
             overflow: hidden;
         }
@@ -41,7 +41,6 @@
             border-radius: 8px;
             border: 2px dashed #ffecb5;
         }
-        /* Hlavní herní plocha - posunuta výš a zkompaktněna */
         .game-card {
             background: white;
             border-radius: 20px;
@@ -78,7 +77,6 @@
             margin: 0;
         }
 
-        /* Políčka pro skládání slova */
         .slot-container {
             display: flex;
             justify-content: center;
@@ -108,7 +106,6 @@
             color: #1c7ed6;
         }
 
-        /* Výběr písmen (Logo Quiz styl) */
         .pool-container {
             display: flex;
             justify-content: center;
@@ -149,7 +146,6 @@
             color: #2b8a3e;
         }
 
-        /* Přechodová obrazovka / Konec kola */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -257,3 +253,141 @@
             overlayEl.classList.add('hidden');
             nextRound();
         }
+
+        function nextRound() {
+            messageEl.textContent = "";
+            activeWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+            currentSlots = new Array(activeWord.length).fill(null);
+
+            let correctLetters = activeWord.split('');
+            let alphabet = "ABCČDEFGHIJKLMNOPRSŠTUVXYZŽ";
+            let wrongCount = activeWord.length <= 3 ? 2 : 3;
+            let wrongLetters = [];
+
+            while(wrongLetters.length < wrongCount) {
+                let randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+                if (!correctLetters.includes(randomChar) && !wrongLetters.includes(randomChar)) {
+                    wrongLetters.push(randomChar);
+                }
+            }
+
+            // Vytvoříme pole objektů, kde každé písmeno má svůj unikátní index v poolu
+            let combined = [...correctLetters, ...wrongLetters];
+            poolLetters = combined.map((char, idx) => ({
+                id: idx,
+                char: char,
+                used: false
+            }));
+
+            // Zamícháme
+            poolLetters.sort(() => Math.random() - 0.5);
+
+            renderGame();
+            speakWord();
+        }
+
+        function renderGame() {
+            bouquetPreviewEl.textContent = collectedFlowers.join(" ");
+
+            slotContainerEl.innerHTML = "";
+            currentSlots.forEach((tileObj, index) => {
+                const slot = document.createElement('div');
+                slot.classList.add('letter-slot');
+                if (tileObj) {
+                    slot.classList.add('filled');
+                    slot.textContent = tileObj.char;
+                    slot.onclick = () => removeFromSlot(index);
+                } else {
+                    slot.textContent = "";
+                }
+                slotContainerEl.appendChild(slot);
+            });
+
+            poolContainerEl.innerHTML = "";
+            poolLetters.forEach((tileObj) => {
+                const tile = document.createElement('div');
+                tile.classList.add('letter-tile');
+                tile.textContent = tileObj.char;
+                
+                if (tileObj.used) {
+                    tile.classList.add('used');
+                } else {
+                    tile.onclick = () => selectTile(tileObj.id);
+                }
+                poolContainerEl.appendChild(tile);
+            });
+        }
+
+        function speakWord() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let utterance = new SpeechSynthesisUtterance(activeWord);
+                utterance.lang = 'cs-CZ';
+                utterance.rate = 0.75;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function selectTile(tileId) {
+            let emptyIndex = currentSlots.indexOf(null);
+            if (emptyIndex !== -1) {
+                let tileObj = poolLetters.find(p => p.id === tileId);
+                if (tileObj && !tileObj.used) {
+                    tileObj.used = true;
+                    currentSlots[emptyIndex] = tileObj;
+                    
+                    renderGame();
+
+                    if (!currentSlots.includes(null)) {
+                        checkAnswer();
+                    }
+                }
+            }
+        }
+
+        function removeFromSlot(slotIndex) {
+            let tileObj = currentSlots[slotIndex];
+            if (tileObj) {
+                tileObj.used = false;
+                currentSlots[slotIndex] = null;
+                renderGame();
+            }
+        }
+
+        function checkAnswer() {
+            let formedWord = currentSlots.map(s => s ? s.char : '').join('');
+
+            if (formedWord === activeWord) {
+                messageEl.textContent = "Správně! Utrhla jsi kytičku! 🌸";
+                let randomFlower = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
+                collectedFlowers.push(randomFlower);
+
+                setTimeout(() => {
+                    if (currentRound < totalRounds) {
+                        currentRound++;
+                        nextRound();
+                    } else {
+                        showFinalVictory();
+                    }
+                }, 1200);
+            } else {
+                messageEl.style.color = '#e03131';
+                messageEl.textContent = "Takhle to úplně nesedí, zkus to upravit! 🙈";
+                setTimeout(() => {
+                    messageEl.style.color = '#2b8a3e';
+                    messageEl.textContent = "";
+                }, 1500);
+            }
+        }
+
+        function showFinalVictory() {
+            overlayEl.classList.remove('hidden');
+            overlayTitleEl.textContent = "🏆 Úžasné! Máš hotový puget!";
+            overlayTextEl.textContent = `Zvládla jsi všech ${totalRounds} kol a nasbírala nádherné kytičky!`;
+            overlayEmojiEl.textContent = collectedFlowers.join(" ");
+            overlayBtnEl.textContent = "Hrát znovu";
+        }
+    </script>
+
+</body>
+</html>
