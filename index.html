@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hry pro prvňáčka</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+        h1 {
+            color: #fff;
+            font-size: 2.3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 5px;
+        }
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.85);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .game-card {
+            background: white;
+            padding: 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: transform 0.1s, background-color 0.2s;
+            border: 3px solid #4dabf7;
+        }
+        .game-card:active {
+            transform: scale(0.95);
+        }
+        .game-card.inactive {
+            border-color: #ccc;
+            opacity: 0.6;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌟 Herní Svět pro Neteř 🌟</h1>
+    <p>Vyber si, co budeme hrát:</p>
+
+    <div class="menu-container">
+        <!-- Aktivní hra - Počítání -->
+        <a href="pocitani.html" class="game-card">
+            <span>✈️</span> Letecká pošta
+        </a>
+
+        <!-- Místo pro budoucí hru (až vytvoříš např. pismenka.html, stačí změnit href) -->
+        <a href="#" class="game-card inactive" onclick="alert('Tato hra se teprve chystá! 🚀'); return false;">
+            <span>🔤</span> Písmenka (Brzy...)
+        </a>
+    </div>
+
+</body>
+</html>

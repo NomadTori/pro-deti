@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letecká pošta - Hra pro prvňáčky</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            text-align: center;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 94vh;
+            user-select: none;
+            overflow: hidden;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        .stats {
+            font-size: 1.1rem;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .level-badge {
+            background: #f39c12;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        /* Mrak s příkladem */
+        .cloud {
+            background: white;
+            border-radius: 50px;
+            width: 240px;
+            height: 120px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #2c3e50;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .message {
+            font-size: 1.3rem;
+            height: 30px;
+            font-weight: bold;
+        }
+        /* Krabice s odpověďmi */
+        .boxes-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .box {
+            background-color: #d35400;
+            color: white;
+            font-size: 2.2rem;
+            width: 85px;
+            height: 85px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            border: 3px dashed #f39c12;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .box:active {
+            transform: scale(0.9);
+        }
+        .postman {
+            font-size: 3.5rem;
+            margin-bottom: 5px;
+        }
+        /* Obrazovka pro přechod kol / výhru */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 10;
+        }
+        .overlay h2 { font-size: 2.5rem; margin-bottom: 10px; }
+        .overlay p { font-size: 1.4rem; margin-bottom: 20px; }
+        .btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .btn:active { transform: scale(0.95); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Úvodní / přechodová obrazovka -->
+    <div class="overlay" id="overlayScreen">
+        <h2 id="overlayTitle">✈️ Letecká pošta</h2>
+        <p id="overlayText">Připrav se na doručování balíků!</p>
+        <button class="btn" id="overlayBtn" onclick="startNextLevel()">Start hry</button>
+    </div>
+
+    <header>
+        <div>
+            <h1>✈️ Letecká pošta</h1>
+            <div class="level-badge" id="levelBadge">Kolo 1 z 3</div>
+        </div>
+        <div class="stats">Zbývá: <span id="remaining">5</span> 📦</div>
+    </header>
+
+    <!-- Mrak s příkladem -->
+    <div>
+        <div class="cloud" id="cloudMath">1 + 1</div>
+        <div class="message" id="message">Pošli balík do správné krabice!</div>
+    </div>
+
+    <!-- Pošťák -->
+    <div class="postman" id="postman">🧑‍✈️📦</div>
+
+    <!-- Výběr výsledků -->
+    <div class="boxes-container" id="boxesContainer"></div>
+
+    <script>
+        let currentLevel = 1;
+        let remainingInLevel = 5;
+        let currentAnswer = 0;
+        const targetPerLevel = 5;
+
+        const cloudEl = document.getElementById('cloudMath');
+        const boxesEl = document.getElementById('boxesContainer');
+        const remainingEl = document.getElementById('remaining');
+        const messageEl = document.getElementById('message');
+        const postmanEl = document.getElementById('postman');
+        const levelBadgeEl = document.getElementById('levelBadge');
+        
+        const overlayEl = document.getElementById('overlayScreen');
+        const overlayTitleEl = document.getElementById('overlayTitle');
+        const overlayTextEl = document.getElementById('overlayText');
+        const overlayBtnEl = document.getElementById('overlayBtn');
+
+        function startNextLevel() {
+            overlayEl.classList.add('hidden');
+            remainingInLevel = targetPerLevel;
+            remainingEl.textContent = remainingInLevel;
+            levelBadgeEl.textContent = `Kolo ${currentLevel} z 3`;
+            generateRound();
+        }
+
+        function generateRound() {
+            messageEl.textContent = '';
+            postmanEl.textContent = '🧑‍✈️📦';
+
+            let a, b, isMinus = false;
+
+            if (currentLevel === 1) {
+                // Kolo 1: Sčítání do 5
+                a = Math.floor(Math.random() * 4); // 0 až 3
+                b = Math.floor(Math.random() * (5 - a + 1)); // součet max 5
+                currentAnswer = a + b;
+                cloudEl.textContent = `${a} + ${b} = ?`;
+            } else if (currentLevel === 2) {
+                // Kolo 2: Sčítání do 10
+                a = Math.floor(Math.random() * 6); // 0 až 5
+                b = Math.floor(Math.random() * (10 - a + 1)); // součet max 10
+                currentAnswer = a + b;
+                cloudEl.textContent = `${a} + ${b} = ?`;
+            } else {
+                // Kolo 3: Sčítání a odčítání do 10
+                isMinus = Math.random() < 0.5;
+                if (isMinus) {
+                    a = Math.floor(Math.random() * 9) + 2; // 2 až 10
+                    b = Math.floor(Math.random() * a) + 1;  // 1 až a
+                    currentAnswer = a - b;
+                    cloudEl.textContent = `${a} - ${b} = ?`;
+                } else {
+                    a = Math.floor(Math.random() * 6);
+                    b = Math.floor(Math.random() * (10 - a + 1));
+                    currentAnswer = a + b;
+                    cloudEl.textContent = `${a} + ${b} = ?`;
+                }
+            }
+
+            // Vygeneruj 3 možnosti
+            let options = [currentAnswer];
+            let maxLimit = currentLevel === 1 ? 5 : 10;
+            while (options.length < 3) {
+                let wrong = Math.floor(Math.random() * (maxLimit + 1));
+                if (!options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+
+            // Zamíchej krabice
+            options.sort(() => Math.random() - 0.5);
+
+            boxesEl.innerHTML = '';
+            options.forEach(num => {
+                const box = document.createElement('div');
+                box.classList.add('box');
+                box.textContent = num;
+                box.onclick = () => checkAnswer(num, box);
+                boxesEl.appendChild(box);
+            });
+        }
+
+        function checkAnswer(selectedNum, boxElement) {
+            if (selectedNum === currentAnswer) {
+                remainingInLevel--;
+                remainingEl.textContent = remainingInLevel;
+                messageEl.style.color = '#27ae60';
+                messageEl.textContent = 'Paráda, balík doručen! 🚀';
+                postmanEl.textContent = '🥳🎉';
+                boxElement.style.backgroundColor = '#27ae60';
+
+                if (remainingInLevel <= 0) {
+                    setTimeout(showLevelComplete, 800);
+                } else {
+                    setTimeout(generateRound, 1000);
+                }
+            } else {
+                messageEl.style.color = '#c0392b';
+                messageEl.textContent = 'Tohle nebyla správná krabice! 🙈';
+                postmanEl.textContent = '❌📦';
+                boxElement.style.backgroundColor = '#c0392b';
+                
+                setTimeout(() => {
+                    boxElement.style.backgroundColor = '#d35400';
+                }, 400);
+            }
+        }
+
+        function showLevelComplete() {
+            overlayEl.classList.remove('hidden');
+            if (currentLevel < 3) {
+                overlayTitleEl.textContent = `🎉 Kolo ${currentLevel} splněno!`;
+                overlayTextEl.textContent = 'Skvělá práce! Jdeme do těžšího kola.';
+                overlayBtnEl.textContent = 'Další kolo';
+                currentLevel++;
+            } else {
+                overlayTitleEl.textContent = '🏆 Jsi Hlavní pošťák!';
+                overlayTextEl.textContent = 'Dokončila jsi všechna kola a zachránila poštu!';
+                overlayBtnEl.textContent = 'Hrát znovu';
+                currentLevel = 1;
+            }
+        }
+    </script>
+
+</body>
+</html>
