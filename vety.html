@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pytel plný slov - Diančiny hrátky</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
+            text-align: center;
+            margin: 0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px;
+            height: 88vh;
+            user-select: none;
+            overflow: hidden;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 6px 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            margin: 5px 10px 0 10px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.0rem;
+            margin: 0;
+        }
+        .score-badge {
+            font-size: 1.1rem;
+            background: #e7f5ff;
+            padding: 3px 10px;
+            border-radius: 8px;
+            border: 2px dashed #74c0fc;
+            color: #1c7ed6;
+            font-weight: bold;
+        }
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 12px 15px;
+            width: 92%;
+            max-width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .speaker-btn {
+            background: #4dabf7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .speaker-btn:active { transform: scale(0.9); }
+        
+        .sentence-box {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: 2px solid #dee2e6;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .option-card {
+            background: #fff;
+            border: 3px solid #ff9999;
+            border-radius: 15px;
+            padding: 10px;
+            width: 30%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .option-card:active {
+            transform: scale(0.95);
+        }
+        .option-emoji {
+            font-size: 2.5rem;
+        }
+        .option-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .message {
+            font-size: 1.1rem;
+            height: 22px;
+            font-weight: bold;
+            color: #2b8a3e;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 10;
+        }
+        .overlay h2 { font-size: 2.3rem; margin-bottom: 5px; }
+        .overlay p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; padding: 0 20px; }
+        .big-icon { font-size: 4.5rem; margin: 10px 0; }
+        .btn {
+            background: #1c7ed6;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.4rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .btn:active { transform: scale(0.95); }
+        .hidden { display: none !important; }
+        .back-link {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">⬅️ Zpět do menu</a>
+
+    <!-- Úvodní / Koncová obrazovka -->
+    <div class="overlay" id="overlayScreen">
+        <h2>🎒 Pytel plný slov 🎒</h2>
+        <p id="overlayText">Čti věty a vyber správný obrázek, který do nich patří!</p>
+        <div class="big-icon" id="overlayEmoji">📖✨</div>
+        <button class="btn" id="overlayBtn" onclick="startGame()">Začít hrát</button>
+    </div>
+
+    <header>
+        <h1>🎒 Pytel plný slov</h1>
+        <div class="score-badge" id="scoreBadge">Splněno: <span>0</span>/5</div>
+    </header>
+
+    <div class="game-card">
+        <button class="speaker-btn" onclick="speakSentence()" title="Přehrát větu">🔊</button>
+        
+        <div class="sentence-box" id="sentenceBox">
+            Ema má velký ____.
+        </div>
+
+        <div class="message" id="message">Vyber správné slovo:</div>
+
+        <!-- Možnosti výběru -->
+        <div class="options-container" id="optionsContainer">
+            <!-- Generováno JS -->
+        </div>
+    </div>
+
+    <script>
+        // Seznam vět, chybějícího slova a 3 možností (správná + 2 špatné)
+        const quizData = [
+            {
+                sentence: "Ema má velký ____.",
+                readSentence: "Ema má velký",
+                correct: "DOMU",
+                options: [
+                    { word: "DOMU", emoji: "🏠" },
+                    { word: "AUTO", emoji: "🚗" },
+                    { word: "MÍČ", emoji: "⚽" }
+                ]
+            },
+            {
+                sentence: "Na louce roste ____.",
+                readSentence: "Na louce roste",
+                correct: "KVĚT",
+                options: [
+                    { word: "KVĚT", emoji: "🌸" },
+                    { word: "PES", emoji: "🐶" },
+                    { word: "RYBA", emoji: "🐟" }
+                ]
+            },
+            {
+                sentence: "Maličký pes ____.",
+                readSentence: "Maličký pes",
+                correct: "ŠTÉKÁ",
+                options: [
+                    { word: "LÉTÁ", emoji: "🦅" },
+                    { word: "ŠTÉKÁ", emoji: "🐕" },
+                    { word: "PLAVE", emoji: "🏊" }
+                ]
+            },
+            {
+                sentence: "Maminka peče ____.",
+                readSentence: "Maminka peče",
+                correct: "CHLÉB",
+                options: [
+                    { word: "KOLO", emoji: "🚲" },
+                    { word: "CHLÉB", emoji: "🍞" },
+                    { word: "STROM", emoji: "🌳" }
+                ]
+            },
+            {
+                sentence: "Na obloze svítí ____.",
+                readSentence: "Na obloze svítí",
+                correct: "SLUNCE",
+                options: [
+                    { word: "SLUNCE", emoji: "☀️" },
+                    { word: "BOTA", emoji: "👟" },
+                    { word: "KNIHA", emoji: "📖" }
+                ]
+            },
+            {
+                sentence: "Táta řídí ____.",
+                readSentence: "Táta řídí",
+                correct: "AUTO",
+                options: [
+                    { word: "AUTO", emoji: "🚗" },
+                    { word: "TUŽKA", emoji: "✏️" },
+                    { word: "JABLKO", emoji: "🍎" }
+                ]
+            },
+            {
+                sentence: "V rybníku plave ____.",
+                readSentence: "V rybníku plave",
+                correct: "RYBA",
+                options: [
+                    { word: "KOČKA", emoji: "🐱" },
+                    { word: "RYBA", emoji: "🐟" },
+                    { word: "PTÁK", emoji: "🐦" }
+                ]
+            }
+        ];
+
+        let currentRound = 1;
+        const totalRounds = 5;
+        let currentItem = null;
+        let shuffledQueue = [];
+
+        const overlayEl = document.getElementById('overlayScreen');
+        const overlayTitleEl = overlayEl.querySelector('h2');
+        const overlayTextEl = document.getElementById('overlayText');
+        const overlayBtnEl = document.getElementById('overlayBtn');
+        const overlayEmojiEl = document.getElementById('overlayEmoji');
+        
+        const sentenceBoxEl = document.getElementById('sentenceBox');
+        const optionsContainerEl = document.getElementById('optionsContainer');
+        const messageEl = document.getElementById('message');
+        const scoreBadgeEl = document.getElementById('scoreBadge').querySelector('span');
+
+        function startGame() {
+            currentRound = 1;
+            shuffledQueue = [...quizData].sort(() => Math.random() - 0.5);
+            overlayEl.classList.add('hidden');
+            nextRound();
+        }
+
+        function nextRound() {
+            messageEl.textContent = "Vyber správné slovo:";
+            messageEl.style.color = "#2b8a3e";
+
+            if (currentRound > totalRounds || shuffledQueue.length === 0) {
+                showFinalVictory();
+                return;
+            }
+
+            scoreBadgeEl.textContent = `${currentRound - 1}`;
+            currentItem = shuffledQueue.pop();
+
+            sentenceBoxEl.textContent = currentItem.sentence;
+
+            // Zamíchej možnosti na výběr
+            let currentOptions = [...currentItem.options];
+            currentOptions.sort(() => Math.random() - 0.5);
+
+            optionsContainerEl.innerHTML = "";
+            currentOptions.forEach(opt => {
+                const card = document.createElement('div');
+                card.classList.add('option-card');
+                card.innerHTML = `
+                    <div class="option-emoji">${opt.emoji}</div>
+                    <div class="option-text">${opt.word}</div>
+                `;
+                card.onclick = () => checkAnswer(opt.word, card);
+                optionsContainerEl.appendChild(card);
+            });
+
+            speakSentence();
+        }
+
+        function speakSentence() {
+            if ('speechSynthesis' in window && currentItem) {
+                window.speechSynthesis.cancel();
+                // Přečte větu bez podtržítek
+                let textToRead = currentItem.sentence.replace('____', 'prázdno');
+                let utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = 'cs-CZ';
+                utterance.rate = 0.75;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function checkAnswer(selectedWord, cardElement) {
+            if (selectedWord === currentItem.correct) {
+                messageEl.style.color = '#2b8a3e';
+                messageEl.textContent = "Správně! Skvělá práce! 🎉";
+                cardElement.style.backgroundColor = '#d3f9d8';
+                cardElement.style.borderColor = '#40c057';
+
+                // Doplň slovo do věty
+                sentenceBoxEl.textContent = currentItem.sentence.replace('____', selectedWord);
+
+                setTimeout(() => {
+                    currentRound++;
+                    nextRound();
+                }, 1300);
+            } else {
+                messageEl.style.color = '#e03131';
+                messageEl.textContent = "Tohle nesedí, zkus jiný obrázek! 🙈";
+                cardElement.style.backgroundColor = '#ffe3e3';
+                cardElement.style.borderColor = '#fa5252';
+
+                setTimeout(() => {
+                    cardElement.style.backgroundColor = '#fff';
+                    cardElement.style.borderColor = '#ff9999';
+                    messageEl.style.color = '#2b8a3e';
+                    messageEl.textContent = "Vyber správné slovo:";
+                }, 1000);
+            }
+        }
+
+        function showFinalVictory() {
+            overlayEl.classList.remove('hidden');
+            overlayTitleEl.textContent = "🏆 Skvělé čtení!";
+            overlayTextEl.textContent = `Máš za sebou ${totalRounds} úspěšně doplněných vět! Jsi velká šikulka.`;
+            overlayEmojiEl.textContent = "🌟📚🏆";
+            overlayBtnEl.textContent = "Hrát znovu";
+        }
+    </script>
+
+</body>
+</html>
