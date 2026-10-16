@@ -10,11 +10,12 @@
             background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
             text-align: center;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            height: 90vh; /* Zkráceno, aby nic neutíkalo dolů */
+            justify-content: flex-start;
+            gap: 10px;
+            height: 95vh;
             user-select: none;
             overflow: hidden;
         }
@@ -23,70 +24,71 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 8px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 6px 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            margin: 5px 10px 0 10px;
         }
         h1 {
             color: #2c3e50;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin: 0;
         }
         .stats {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #27ae60;
             font-weight: bold;
         }
         .level-badge {
             background: #f39c12;
             color: white;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.85rem;
         }
-        /* Mrak s příkladem */
+        /* Mrak s příkladem - zmenšeno, aby zabral méně místa */
         .cloud {
             background: white;
-            border-radius: 50px;
-            width: 220px;
-            height: 110px;
-            margin: 5px auto;
+            border-radius: 40px;
+            width: 190px;
+            height: 90px;
+            margin: 2px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.8rem;
+            font-size: 2.3rem;
             color: #2c3e50;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+            50% { transform: translateY(-4px); }
         }
         .message {
-            font-size: 1.2rem;
-            height: 25px;
+            font-size: 1.1rem;
+            height: 22px;
             font-weight: bold;
         }
-        /* Krabice s odpověďmi - vytažené výš */
+        /* Krabice s odpověďmi - výrazně výš */
         .boxes-container {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 25px; /* Větší mezera od spodku kvůli Netlify liště */
+            margin-top: 5px;
         }
         .box {
             background-color: #d35400;
             color: white;
-            font-size: 2.2rem;
-            width: 80px;
-            height: 80px;
+            font-size: 2rem;
+            width: 75px;
+            height: 75px;
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
             border: 3px dashed #f39c12;
             transition: transform 0.1s, background-color 0.2s;
         }
@@ -94,8 +96,8 @@
             transform: scale(0.9);
         }
         .postman {
-            font-size: 3.2rem;
-            margin-bottom: 2px;
+            font-size: 2.6rem;
+            margin: 0;
         }
         /* Obrazovka pro přechod kol / výhru */
         .overlay {
