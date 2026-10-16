@@ -93,7 +93,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #333;
             background: #f8f9fa;
@@ -114,11 +114,12 @@
             margin-top: 2px;
         }
         .letter-tile {
-            width: 40px;
+            min-width: 40px;
             height: 40px;
+            padding: 0 4px;
             background: #fab005;
             color: white;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
             border-radius: 10px;
             display: flex;
@@ -224,7 +225,7 @@
             "PES", "KOČKA", "MÁMA", "TÁTA", "STROM", "LIST", 
             "DŮM", "AUTO", "KOLO", "KVĚT", "SLUNCE", "VODA", 
             "RYBA", "MLÉKO", "CHLÉB", "JABLKO", "HRAD", "PTÁK",
-            "OKNO", "MÍČ", "KNIHA", "ŠKOLA", "LÉTO", "ZIMA"
+            "OKNO", "MÍČ", "KNIHA", "ŠKOLA", "LÉTO", "ZIMA", "CHLAPEC", "HRAČKA"
         ];
 
         let currentRound = 1;
@@ -247,6 +248,22 @@
 
         const flowerEmojis = ['🌷', '🌻', '🌹', '🌼', '🌸', '🌺', '💐', '🍀'];
 
+        // Funkce pro rozdělení slova na písmena s respektováním CH jako jednoho znaku
+        function parseWordIntoLetters(word) {
+            let letters = [];
+            let i = 0;
+            while (i < word.length) {
+                if (word[i] === 'C' && i + 1 < word.length && word[i+1] === 'H') {
+                    letters.push('CH');
+                    i += 2;
+                } else {
+                    letters.push(word[i]);
+                    i += 1;
+                }
+            }
+            return letters;
+        }
+
         function startGame() {
             currentRound = 1;
             collectedFlowers = [];
@@ -257,11 +274,13 @@
         function nextRound() {
             messageEl.textContent = "";
             activeWord = wordsList[Math.floor(Math.random() * wordsList.length)];
-            currentSlots = new Array(activeWord.length).fill(null);
+            
+            let correctLetters = parseWordIntoLetters(activeWord);
+            currentSlots = new Array(correctLetters.length).fill(null);
 
-            let correctLetters = activeWord.split('');
-            let alphabet = "ABCČDEFGHIJKLMNOPRSŠTUVXYZŽ";
-            let wrongCount = activeWord.length <= 3 ? 2 : 3;
+            // Abeceda, kde CH je samostatná položka
+            let alphabet = ["A", "B", "C", "Č", "D", "Ď", "E", "F", "G", "H", "CH", "I", "J", "K", "L", "M", "N", "Ň", "O", "P", "R", "Ř", "S", "Š", "T", "Ť", "U", "V", "Y", "Z", "Ž"];
+            let wrongCount = correctLetters.length <= 3 ? 2 : 3;
             let wrongLetters = [];
 
             while(wrongLetters.length < wrongCount) {
@@ -271,7 +290,6 @@
                 }
             }
 
-            // Vytvoříme pole objektů, kde každé písmeno má svůj unikátní index v poolu
             let combined = [...correctLetters, ...wrongLetters];
             poolLetters = combined.map((char, idx) => ({
                 id: idx,
@@ -279,7 +297,6 @@
                 used: false
             }));
 
-            // Zamícháme
             poolLetters.sort(() => Math.random() - 0.5);
 
             renderGame();
@@ -356,8 +373,9 @@
 
         function checkAnswer() {
             let formedWord = currentSlots.map(s => s ? s.char : '').join('');
+            let expectedWord = parseWordIntoLetters(activeWord).join('');
 
-            if (formedWord === activeWord) {
+            if (formedWord === expectedWord) {
                 messageEl.textContent = "Správně! Utrhla jsi kytičku! 🌸";
                 let randomFlower = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
                 collectedFlowers.push(randomFlower);
