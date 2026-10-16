@@ -58,6 +58,9 @@
         .game-card:active {
             transform: scale(0.95);
         }
+        .game-card.flowers {
+            border-color: #40c057;
+        }
         .game-card.inactive {
             border-color: #ccc;
             opacity: 0.6;
@@ -76,7 +79,12 @@
             <span>✈️</span> Letecká pošta
         </a>
 
-        <!-- Místo pro budoucí hru (až vytvoříš např. pismenka.html, stačí změnit href) -->
+        <!-- Aktivní hra - Trhání kytek -->
+        <a href="kytky.html" class="game-card flowers">
+            <span>🌷</span> Trhání kytek
+        </a>
+
+        <!-- Místo pro budoucí hru -->
         <a href="#" class="game-card inactive" onclick="alert('Tato hra se teprve chystá! 🚀'); return false;">
             <span>🔤</span> Písmenka (Brzy...)
         </a>
