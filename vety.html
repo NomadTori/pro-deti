@@ -2,275 +2,404 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pytel plný slov - Diančiny hrátky</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
-            text-align: center;
+        :root {
+            --bg-top: #a1c4fd;
+            --bg-bottom: #c2e9fb;
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --btn-blue: #4dabf7;
+            --btn-blue-shadow: #228be6;
+            --card-border: #dee2e6;
+            --card-shadow: rgba(0,0,0,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 5px;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: 8px;
-            height: 88vh;
+            align-items: center;
+            height: 100dvh;
             user-select: none;
             overflow: hidden;
+            padding: 10px;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 6px 15px;
+
+        /* Tlačítko Zpět */
+        .back-link {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
             border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-            margin: 5px 10px 0 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(5px);
         }
-        h1 {
-            color: #2c3e50;
-            font-size: 1.0rem;
-            margin: 0;
+
+        /* --- HLAVIČKA --- */
+        header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 50px; /* Odsazení kvůli tlačítku Zpět */
+            margin-bottom: 2vh;
+            padding: 0 10px;
         }
+
         .score-badge {
-            font-size: 1.1rem;
-            background: #e7f5ff;
-            padding: 3px 10px;
-            border-radius: 8px;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
             border: 2px dashed #74c0fc;
             color: #1c7ed6;
-            font-weight: bold;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+
+        /* --- HERNÍ PLOCHA --- */
         .game-card {
-            background: white;
-            border-radius: 20px;
-            padding: 12px 15px;
-            width: 92%;
-            max-width: 450px;
-            margin: 0 auto;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            flex: 1;
+            max-height: 70vh;
         }
+
+        /* Tlačítko reproduktoru */
         .speaker-btn {
-            background: #4dabf7;
+            background: var(--btn-blue);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 1.8rem;
+            width: 70px;
+            height: 70px;
+            font-size: 2.2rem;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 0 var(--btn-blue-shadow), 0 10px 15px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s;
-        }
-        .speaker-btn:active { transform: scale(0.9); }
-        
-        .sentence-box {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #2c3e50;
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 15px;
-            border: 2px solid #dee2e6;
-            width: 100%;
-            box-sizing: border-box;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
 
-        .options-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        .speaker-btn:active, .speaker-btn.clicked {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--btn-blue-shadow), 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Hlavní box s větou */
+        .sentence-box {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: #f8f9fa;
+            padding: 20px 15px;
+            border-radius: 20px;
+            border: 3px solid var(--card-border);
             width: 100%;
-            margin-top: 5px;
-        }
-        .option-card {
-            background: #fff;
-            border: 3px solid #ff9999;
-            border-radius: 15px;
-            padding: 10px;
-            width: 30%;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+            min-height: 90px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 5px;
-            transition: transform 0.1s, background-color 0.2s;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
-        .option-card:active {
-            transform: scale(0.95);
+
+        .sentence-box.correct-anim {
+            background: #e8f5e9;
+            border-color: var(--success);
+            color: var(--success);
+            transform: scale(1.02);
         }
-        .option-emoji {
-            font-size: 2.5rem;
-        }
-        .option-text {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #333;
+
+        .blank-space {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px solid var(--primary);
+            margin: 0 5px;
+            color: var(--btn-blue);
         }
 
         .message {
-            font-size: 1.1rem;
-            height: 22px;
-            font-weight: bold;
-            color: #2b8a3e;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #7f8c8d;
+            min-height: 28px;
+            text-align: center;
+            margin-top: 5px;
         }
 
+        /* Kartičky s možnostmi */
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            margin-top: auto; /* Tlačí možnosti dolů */
+            padding-bottom: 10px;
+        }
+
+        .option-card {
+            background: #fff;
+            border: 3px solid var(--card-border);
+            border-radius: 20px;
+            padding: 15px 10px;
+            width: 30%;
+            max-width: 110px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--card-border), 0 10px 15px var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .option-card:active, .option-card.clicked {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--card-border), 0 5px 10px var(--card-shadow);
+        }
+
+        .option-emoji {
+            font-size: 2.8rem;
+            line-height: 1;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .option-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        /* Stavy kartiček */
+        .option-card.correct {
+            border-color: #2ecc71;
+            background: #e8f5e9;
+            box-shadow: 0 6px 0 #27ae60;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .option-card.correct .option-emoji {
+            transform: scale(1.2);
+        }
+
+        .option-card.wrong {
+            border-color: #ff7675;
+            background: #ffeaa7;
+            box-shadow: 0 6px 0 #d63031;
+            animation: shake 0.4s;
+            pointer-events: none;
+        }
+
+        .option-card.disabled {
+            opacity: 0.5;
+            filter: grayscale(80%);
+            pointer-events: none;
+            box-shadow: 0 0 0 transparent;
+            transform: translateY(6px);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* --- OVERLAY (Přechody) --- */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(44, 62, 80, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            z-index: 10;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
-        .overlay h2 { font-size: 2.3rem; margin-bottom: 5px; }
-        .overlay p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; padding: 0 20px; }
-        .big-icon { font-size: 4.5rem; margin: 10px 0; }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .overlay h2 { font-size: 2.8rem; margin-bottom: 15px; text-align: center; }
+        .overlay p { font-size: 1.3rem; margin-bottom: 30px; text-align: center; padding: 0 20px; color: #ecf0f1; }
+        
+        .big-icon { 
+            font-size: 5rem; 
+            margin: 10px 0 30px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
         .btn {
-            background: #1c7ed6;
+            background: var(--btn-blue);
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.4rem;
-            border-radius: 15px;
+            padding: 18px 40px;
+            font-size: 1.6rem;
+            font-family: inherit;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            font-weight: 600;
+            box-shadow: 0 8px 0 var(--btn-blue-shadow);
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .btn:active { transform: scale(0.95); }
-        .hidden { display: none !important; }
-        .back-link {
-            position: absolute;
-            top: 8px;
-            left: 10px;
-            background: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-size: 0.85rem;
-            z-index: 5;
+
+        .btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 var(--btn-blue-shadow);
         }
+
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link">⬅️ Zpět do menu</a>
+    <a href="index.html" class="back-link">⬅️ Zpět</a>
 
     <!-- Úvodní / Koncová obrazovka -->
     <div class="overlay" id="overlayScreen">
-        <h2>🎒 Pytel plný slov 🎒</h2>
+        <h2 id="overlayTitle">🎒 Pytel plný slov</h2>
         <p id="overlayText">Čti věty a vyber správný obrázek, který do nich patří!</p>
         <div class="big-icon" id="overlayEmoji">📖✨</div>
-        <button class="btn" id="overlayBtn" onclick="startGame()">Začít hrát</button>
+        <button class="btn" id="overlayBtn">Začít hrát</button>
     </div>
 
     <header>
-        <h1>🎒 Pytel plný slov</h1>
-        <div class="score-badge" id="scoreBadge">Splněno: <span>0</span>/5</div>
+        <div class="score-badge" id="scoreBadge">Kolo: <span>1</span>/5</div>
     </header>
 
     <div class="game-card">
-        <button class="speaker-btn" onclick="speakSentence()" title="Přehrát větu">🔊</button>
+        <button class="speaker-btn" id="speakerBtn" title="Přehrát větu">🔊</button>
         
         <div class="sentence-box" id="sentenceBox">
-            Ema má velký ____.
+            <!-- Doplní JS -->
         </div>
 
         <div class="message" id="message">Vyber správné slovo:</div>
 
-        <!-- Možnosti výběru -->
         <div class="options-container" id="optionsContainer">
             <!-- Generováno JS -->
         </div>
     </div>
 
     <script>
-        // Seznam vět, chybějícího slova a 3 možností (správná + 2 špatné)
+        // Databáze (včetně formátování vět pro zobrazení)
         const quizData = [
             {
-                sentence: "Ema má velký ____.",
-                readSentence: "Ema má velký",
-                correct: "DOMU",
+                textPart1: "Ema má velký ", textPart2: ".",
+                readSentence: "Ema má velký prázdno.",
+                correct: "DOMŮ", // S diakritikou, ale do UI to dáme srozumitelně
                 options: [
-                    { word: "DOMU", emoji: "🏠" },
-                    { word: "AUTO", emoji: "🚗" },
-                    { word: "MÍČ", emoji: "⚽" }
+                    { word: "DOMŮ", label: "DŮM", emoji: "🏠" },
+                    { word: "AUTO", label: "AUTO", emoji: "🚗" },
+                    { word: "MÍČ", label: "MÍČ", emoji: "⚽" }
                 ]
             },
             {
-                sentence: "Na louce roste ____.",
-                readSentence: "Na louce roste",
+                textPart1: "Na louce roste ", textPart2: ".",
+                readSentence: "Na louce roste prázdno.",
                 correct: "KVĚT",
                 options: [
-                    { word: "KVĚT", emoji: "🌸" },
-                    { word: "PES", emoji: "🐶" },
-                    { word: "RYBA", emoji: "🐟" }
+                    { word: "KVĚT", label: "KVĚT", emoji: "🌸" },
+                    { word: "PES", label: "PES", emoji: "🐶" },
+                    { word: "RYBA", label: "RYBA", emoji: "🐟" }
                 ]
             },
             {
-                sentence: "Maličký pes ____.",
-                readSentence: "Maličký pes",
-                correct: "ŠTÉKÁ",
+                textPart1: "Maličký pes ", textPart2: ".",
+                readSentence: "Maličký pes prázdno.",
+                correct: "ŠTĚKÁ",
                 options: [
-                    { word: "LÉTÁ", emoji: "🦅" },
-                    { word: "ŠTÉKÁ", emoji: "🐕" },
-                    { word: "PLAVE", emoji: "🏊" }
+                    { word: "LÉTÁ", label: "LÉTÁ", emoji: "🦅" },
+                    { word: "ŠTĚKÁ", label: "ŠTĚKÁ", emoji: "🐕" },
+                    { word: "PLAVE", label: "PLAVE", emoji: "🏊" }
                 ]
             },
             {
-                sentence: "Maminka peče ____.",
-                readSentence: "Maminka peče",
+                textPart1: "Maminka peče ", textPart2: ".",
+                readSentence: "Maminka peče prázdno.",
                 correct: "CHLÉB",
                 options: [
-                    { word: "KOLO", emoji: "🚲" },
-                    { word: "CHLÉB", emoji: "🍞" },
-                    { word: "STROM", emoji: "🌳" }
+                    { word: "KOLO", label: "KOLO", emoji: "🚲" },
+                    { word: "CHLÉB", label: "CHLÉB", emoji: "🍞" },
+                    { word: "STROM", label: "STROM", emoji: "🌳" }
                 ]
             },
             {
-                sentence: "Na obloze svítí ____.",
-                readSentence: "Na obloze svítí",
+                textPart1: "Na obloze svítí ", textPart2: ".",
+                readSentence: "Na obloze svítí prázdno.",
                 correct: "SLUNCE",
                 options: [
-                    { word: "SLUNCE", emoji: "☀️" },
-                    { word: "BOTA", emoji: "👟" },
-                    { word: "KNIHA", emoji: "📖" }
+                    { word: "SLUNCE", label: "SLUNCE", emoji: "☀️" },
+                    { word: "BOTA", label: "BOTA", emoji: "👟" },
+                    { word: "KNIHA", label: "KNIHA", emoji: "📖" }
                 ]
             },
             {
-                sentence: "Táta řídí ____.",
-                readSentence: "Táta řídí",
+                textPart1: "Táta řídí ", textPart2: ".",
+                readSentence: "Táta řídí prázdno.",
                 correct: "AUTO",
                 options: [
-                    { word: "AUTO", emoji: "🚗" },
-                    { word: "TUŽKA", emoji: "✏️" },
-                    { word: "JABLKO", emoji: "🍎" }
+                    { word: "AUTO", label: "AUTO", emoji: "🚗" },
+                    { word: "TUŽKA", label: "TUŽKA", emoji: "✏️" },
+                    { word: "JABLKO", label: "JABLKO", emoji: "🍎" }
                 ]
             },
             {
-                sentence: "V rybníku plave ____.",
-                readSentence: "V rybníku plave",
+                textPart1: "V rybníku plave ", textPart2: ".",
+                readSentence: "V rybníku plave prázdno.",
                 correct: "RYBA",
                 options: [
-                    { word: "KOČKA", emoji: "🐱" },
-                    { word: "RYBA", emoji: "🐟" },
-                    { word: "PTÁK", emoji: "🐦" }
+                    { word: "KOČKA", label: "KOČKA", emoji: "🐱" },
+                    { word: "RYBA", label: "RYBA", emoji: "🐟" },
+                    { word: "PTÁK", label: "PTÁK", emoji: "🐦" }
                 ]
             }
         ];
@@ -279,9 +408,10 @@
         const totalRounds = 5;
         let currentItem = null;
         let shuffledQueue = [];
+        let isProcessing = false;
 
         const overlayEl = document.getElementById('overlayScreen');
-        const overlayTitleEl = overlayEl.querySelector('h2');
+        const overlayTitleEl = document.getElementById('overlayTitle');
         const overlayTextEl = document.getElementById('overlayText');
         const overlayBtnEl = document.getElementById('overlayBtn');
         const overlayEmojiEl = document.getElementById('overlayEmoji');
@@ -290,6 +420,25 @@
         const optionsContainerEl = document.getElementById('optionsContainer');
         const messageEl = document.getElementById('message');
         const scoreBadgeEl = document.getElementById('scoreBadge').querySelector('span');
+        const speakerBtn = document.getElementById('speakerBtn');
+
+        // Události pro mobily
+        overlayBtnEl.addEventListener('pointerdown', startGame);
+        
+        speakerBtn.addEventListener('pointerdown', function() {
+            if(isProcessing) return;
+            this.classList.add('clicked');
+            speakSentence(false);
+            setTimeout(() => this.classList.remove('clicked'), 150);
+        });
+
+        function renderSentence(word = "") {
+            if (word === "") {
+                sentenceBoxEl.innerHTML = `${currentItem.textPart1}<span class="blank-space"></span>${currentItem.textPart2}`;
+            } else {
+                sentenceBoxEl.innerHTML = `${currentItem.textPart1}<span style="color: var(--success); border-bottom: 3px solid var(--success);">${word}</span>${currentItem.textPart2}`;
+            }
+        }
 
         function startGame() {
             currentRound = 1;
@@ -299,22 +448,22 @@
         }
 
         function nextRound() {
+            isProcessing = false;
             messageEl.textContent = "Vyber správné slovo:";
-            messageEl.style.color = "#2b8a3e";
+            messageEl.style.color = "#7f8c8d";
+            sentenceBoxEl.classList.remove('correct-anim');
 
             if (currentRound > totalRounds || shuffledQueue.length === 0) {
                 showFinalVictory();
                 return;
             }
 
-            scoreBadgeEl.textContent = `${currentRound - 1}`;
+            scoreBadgeEl.textContent = currentRound;
             currentItem = shuffledQueue.pop();
 
-            sentenceBoxEl.textContent = currentItem.sentence;
+            renderSentence();
 
-            // Zamíchej možnosti na výběr
-            let currentOptions = [...currentItem.options];
-            currentOptions.sort(() => Math.random() - 0.5);
+            let currentOptions = [...currentItem.options].sort(() => Math.random() - 0.5);
 
             optionsContainerEl.innerHTML = "";
             currentOptions.forEach(opt => {
@@ -322,53 +471,79 @@
                 card.classList.add('option-card');
                 card.innerHTML = `
                     <div class="option-emoji">${opt.emoji}</div>
-                    <div class="option-text">${opt.word}</div>
+                    <div class="option-text">${opt.label}</div>
                 `;
-                card.onclick = () => checkAnswer(opt.word, card);
+                
+                card.addEventListener('pointerdown', function() {
+                    if(isProcessing || this.classList.contains('disabled') || this.classList.contains('wrong')) return;
+                    this.classList.add('clicked');
+                    setTimeout(() => {
+                        this.classList.remove('clicked');
+                        checkAnswer(opt.word, opt.label, this);
+                    }, 100);
+                });
+                
                 optionsContainerEl.appendChild(card);
             });
 
-            speakSentence();
+            // Přehrání při startu kola
+            setTimeout(() => speakSentence(false), 500);
         }
 
-        function speakSentence() {
+        function speakSentence(fullSentence = false, readWord = "") {
             if ('speechSynthesis' in window && currentItem) {
                 window.speechSynthesis.cancel();
-                // Přečte větu bez podtržítek
-                let textToRead = currentItem.sentence.replace('____', 'prázdno');
+                let textToRead = fullSentence 
+                    ? `${currentItem.textPart1} ${readWord} ${currentItem.textPart2}` 
+                    : currentItem.readSentence;
+                
                 let utterance = new SpeechSynthesisUtterance(textToRead);
                 utterance.lang = 'cs-CZ';
-                utterance.rate = 0.75;
+                utterance.rate = 0.8;
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        function checkAnswer(selectedWord, cardElement) {
+        function checkAnswer(selectedWord, displayLabel, cardElement) {
             if (selectedWord === currentItem.correct) {
-                messageEl.style.color = '#2b8a3e';
+                isProcessing = true;
+                messageEl.style.color = 'var(--success)';
                 messageEl.textContent = "Správně! Skvělá práce! 🎉";
-                cardElement.style.backgroundColor = '#d3f9d8';
-                cardElement.style.borderColor = '#40c057';
+                
+                cardElement.classList.add('correct');
+                sentenceBoxEl.classList.add('correct-anim');
+                
+                // Zneaktivní ostatní karty
+                Array.from(optionsContainerEl.children).forEach(child => {
+                    if (child !== cardElement) child.classList.add('disabled');
+                });
 
-                // Doplň slovo do věty
-                sentenceBoxEl.textContent = currentItem.sentence.replace('____', selectedWord);
+                renderSentence(displayLabel);
+                
+                // Přečte celou správnou větu
+                speakSentence(true, displayLabel);
 
                 setTimeout(() => {
                     currentRound++;
                     nextRound();
-                }, 1300);
+                }, 2500); // Delší pauza, aby dohrála čtená věta
+                
             } else {
-                messageEl.style.color = '#e03131';
-                messageEl.textContent = "Tohle nesedí, zkus jiný obrázek! 🙈";
-                cardElement.style.backgroundColor = '#ffe3e3';
-                cardElement.style.borderColor = '#fa5252';
-
+                messageEl.style.color = 'var(--error)';
+                messageEl.textContent = "To se nehodí, zkus to znovu! 🙈";
+                
+                cardElement.classList.add('wrong');
+                
                 setTimeout(() => {
-                    cardElement.style.backgroundColor = '#fff';
-                    cardElement.style.borderColor = '#ff9999';
-                    messageEl.style.color = '#2b8a3e';
-                    messageEl.textContent = "Vyber správné slovo:";
-                }, 1000);
+                    // Karta zůstane jako disabled (zašedlá), aby dítě vědělo, že už ji zkusilo
+                    cardElement.classList.remove('wrong');
+                    cardElement.classList.add('disabled');
+                    cardElement.style.borderColor = 'var(--card-border)';
+                    cardElement.style.backgroundColor = '#f8f9fa';
+                    
+                    messageEl.style.color = '#7f8c8d';
+                    messageEl.textContent = "Zkus jiný obrázek:";
+                }, 800);
             }
         }
 
