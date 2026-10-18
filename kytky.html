@@ -2,216 +2,305 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Trhání kytek - Diančiny hrátky</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(to bottom, #d4fc79 0%, #96e6a1 100%);
-            text-align: center;
+        :root {
+            --bg-top: #d4fc79;
+            --bg-bottom: #96e6a1;
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --tile-bg: #fab005;
+            --tile-shadow: #e67700;
+            --slot-border: #4dabf7;
+            --slot-filled-bg: #e7f5ff;
+            --slot-filled-border: #339af0;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 5px;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: 8px;
-            height: 88vh;
+            align-items: center;
+            height: 100dvh;
             user-select: none;
             overflow: hidden;
+            padding: 10px;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 6px 15px;
+
+        /* Tlačítko Zpět */
+        .back-link {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
             border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-            margin: 5px 10px 0 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(5px);
         }
-        h1 {
-            color: #2c3e50;
-            font-size: 1.0rem;
-            margin: 0;
+
+        /* --- HLAVIČKA --- */
+        header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-end; /* Posunuto doprava kvůli tlačítku zpět */
+            align-items: center;
+            margin-top: 50px; /* Místo pro tlačítko zpět */
+            margin-bottom: 2vh;
+            padding: 0 10px;
         }
+
         .bouquet-preview {
-            font-size: 1.1rem;
-            background: #fff3cd;
-            padding: 3px 8px;
-            border-radius: 8px;
-            border: 2px dashed #ffecb5;
-        }
-        .game-card {
-            background: white;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 15px;
             border-radius: 20px;
-            padding: 10px 15px;
-            width: 92%;
-            max-width: 450px;
-            margin: 0 auto;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            border: 2px dashed #a8e6cf;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- HERNÍ PLOCHA --- */
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
+            flex: 1;
+            max-height: 70vh;
         }
+
+        /* Tlačítko reproduktoru */
         .speaker-btn {
             background: #ff6b6b;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 55px;
-            height: 55px;
-            font-size: 1.8rem;
+            width: 70px;
+            height: 70px;
+            font-size: 2.2rem;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 0 #c0392b, 0 10px 15px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .speaker-btn:active { transform: scale(0.9); }
-        
+
+        .speaker-btn:active, .speaker-btn.clicked {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #c0392b, 0 5px 10px rgba(0,0,0,0.1);
+        }
+
         .hint-text {
-            font-size: 0.8rem;
-            color: #666;
-            margin: 0;
-        }
-
-        .slot-container {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            min-height: 45px;
-            margin: 2px 0;
-            flex-wrap: wrap;
-        }
-        .letter-slot {
-            width: 40px;
-            height: 45px;
-            border: 3px dashed #4dabf7;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-        .letter-slot.filled {
-            border-style: solid;
-            background: #e7f5ff;
-            border-color: #339af0;
-            color: #1c7ed6;
-        }
-
-        .pool-container {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-top: 2px;
-        }
-        .letter-tile {
-            min-width: 40px;
-            height: 40px;
-            padding: 0 4px;
-            background: #fab005;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-            transition: transform 0.1s, opacity 0.2s;
-            border-bottom: 3px solid #e67700;
-        }
-        .letter-tile:active {
-            transform: scale(0.9);
-        }
-        .letter-tile.used {
-            opacity: 0.2;
-            pointer-events: none;
-            background: #adb5bd;
-            border-color: #6c757d;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-top: -5px;
         }
 
         .message {
-            font-size: 1.1rem;
-            height: 22px;
-            font-weight: bold;
-            color: #2b8a3e;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            min-height: 28px;
+            text-align: center;
         }
 
+        /* Sloty pro slovo */
+        .slot-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            min-height: 55px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .letter-slot {
+            width: 45px;
+            height: 55px;
+            border: 3px dashed var(--slot-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .letter-slot.filled {
+            border-style: solid;
+            background: var(--slot-filled-bg);
+            border-color: var(--slot-filled-border);
+            color: #1c7ed6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .letter-slot.filled:active {
+            transform: scale(0.9);
+        }
+
+        .slot-container.wrong .letter-slot.filled {
+            border-color: var(--error);
+            color: var(--error);
+            background: #ffeaa7;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Výběr písmen */
+        .pool-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .letter-tile {
+            min-width: 50px;
+            height: 55px;
+            padding: 0 5px;
+            background: var(--tile-bg);
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--tile-shadow), 0 10px 15px rgba(0,0,0,0.1);
+            transition: transform 0.1s, box-shadow 0.1s, opacity 0.3s;
+        }
+
+        .letter-tile:active, .letter-tile.clicked {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--tile-shadow), 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .letter-tile.used {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+        }
+
+        /* --- OVERLAY (Přechody) --- */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(44, 62, 80, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            z-index: 10;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
-        .overlay h2 { font-size: 2.3rem; margin-bottom: 5px; }
-        .overlay p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; padding: 0 20px; }
-        .big-bouquet { font-size: 4.5rem; margin: 10px 0; }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .overlay h2 { font-size: 2.5rem; margin-bottom: 10px; text-align: center; }
+        .overlay p { font-size: 1.2rem; margin-bottom: 20px; text-align: center; padding: 0 20px; color: #ecf0f1; }
+        
+        .big-bouquet { 
+            font-size: 4.5rem; 
+            margin: 15px 0 30px 0; 
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
         .btn {
-            background: #2b8a3e;
+            background: var(--success);
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.4rem;
-            border-radius: 15px;
+            padding: 18px 40px;
+            font-size: 1.5rem;
+            font-family: inherit;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            font-weight: 600;
+            box-shadow: 0 8px 0 #219a52;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .btn:active { transform: scale(0.95); }
-        .hidden { display: none !important; }
-        .back-link {
-            position: absolute;
-            top: 8px;
-            left: 10px;
-            background: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-size: 0.85rem;
-            z-index: 5;
+
+        .btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #219a52;
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link">⬅️ Zpět do menu</a>
+    <a href="index.html" class="back-link">⬅️ Zpět</a>
 
     <!-- Úvodní / Koncová obrazovka -->
     <div class="overlay" id="overlayScreen">
-        <h2>🌸 Trhání kytek 🌸</h2>
-        <p id="overlayText">Poskládej slova, utrhni kytičky a postav ten nejkrásnější puget pro maminku nebo tety!</p>
+        <h2 id="overlayTitle">🌸 Trhání kytek 🌸</h2>
+        <p id="overlayText">Poskládej slova, utrhni kytičky a postav ten nejkrásnější puget pro maminku nebo babičku!</p>
         <div class="big-bouquet" id="overlayEmoji">🌷🌻🌹</div>
-        <button class="btn" id="overlayBtn" onclick="startGame()">Začít hrát</button>
+        <button class="btn" id="overlayBtn">Začít hrát</button>
     </div>
 
     <header>
-        <h1>🌷 Trhání kytek</h1>
-        <div class="bouquet-preview" id="bouquetPreview">Puget: <span></span></div>
+        <div class="bouquet-preview" id="bouquetPreview"></div>
     </header>
 
     <div class="game-card">
-        <button class="speaker-btn" onclick="speakWord()" title="Přehrát slovo">🔊</button>
-        <p class="hint-text">(kliknutím uslyšíš slovo)</p>
+        <button class="speaker-btn" id="speakerBtn" title="Přehrát slovo">🔊</button>
+        <p class="hint-text">klikni pro poslech</p>
         
-        <div class="message" id="message">Poskládej slovo z písmen</div>
+        <div class="message" id="message">Poskládej slovo</div>
 
         <!-- Prázdná políčka pro slovo -->
         <div class="slot-container" id="slotContainer"></div>
@@ -225,8 +314,11 @@
             "PES", "KOČKA", "MÁMA", "TÁTA", "STROM", "LIST", 
             "DŮM", "AUTO", "KOLO", "KVĚT", "SLUNCE", "VODA", 
             "RYBA", "MLÉKO", "CHLÉB", "JABLKO", "HRAD", "PTÁK",
-            "OKNO", "MÍČ", "KNIHA", "ŠKOLA", "LÉTO", "ZIMA", "CHLAPEC", "HRAČKA"
+            "OKNO", "MÍČ", "KNIHA", "ŠKOLA", "LÉTO", "ZIMA", "HRAČKA"
         ];
+
+        // Seznam preferovaných špatných písmen (často samohlásky pro zmatení)
+        const trickyLetters = ["A", "E", "I", "O", "U", "Y", "M", "L", "S", "P", "K"];
 
         let currentRound = 1;
         const totalRounds = 5;
@@ -234,9 +326,10 @@
         let collectedFlowers = [];
         let currentSlots = [];
         let poolLetters = [];
+        let isProcessing = false;
 
         const overlayEl = document.getElementById('overlayScreen');
-        const overlayTitleEl = overlayEl.querySelector('h2');
+        const overlayTitleEl = document.getElementById('overlayTitle');
         const overlayTextEl = document.getElementById('overlayText');
         const overlayBtnEl = document.getElementById('overlayBtn');
         const overlayEmojiEl = document.getElementById('overlayEmoji');
@@ -244,11 +337,21 @@
         const slotContainerEl = document.getElementById('slotContainer');
         const poolContainerEl = document.getElementById('poolContainer');
         const messageEl = document.getElementById('message');
-        const bouquetPreviewEl = document.getElementById('bouquetPreview').querySelector('span');
+        const bouquetPreviewEl = document.getElementById('bouquetPreview');
+        const speakerBtn = document.getElementById('speakerBtn');
 
         const flowerEmojis = ['🌷', '🌻', '🌹', '🌼', '🌸', '🌺', '💐', '🍀'];
 
-        // Funkce pro rozdělení slova na písmena s respektováním CH jako jednoho znaku
+        // Události pro tlačítka (pointerdown pro mobily)
+        overlayBtnEl.addEventListener('pointerdown', startGame);
+        
+        speakerBtn.addEventListener('pointerdown', function() {
+            this.classList.add('clicked');
+            speakWord();
+            setTimeout(() => this.classList.remove('clicked'), 150);
+        });
+
+        // CH parser
         function parseWordIntoLetters(word) {
             let letters = [];
             let i = 0;
@@ -272,19 +375,24 @@
         }
 
         function nextRound() {
-            messageEl.textContent = "";
-            activeWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+            isProcessing = false;
+            messageEl.textContent = "Poskládej slovo";
+            messageEl.style.color = "var(--primary)";
+            slotContainerEl.classList.remove('wrong');
             
+            activeWord = wordsList[Math.floor(Math.random() * wordsList.length)];
             let correctLetters = parseWordIntoLetters(activeWord);
             currentSlots = new Array(correctLetters.length).fill(null);
 
-            // Abeceda, kde CH je samostatná položka
-            let alphabet = ["A", "B", "C", "Č", "D", "Ď", "E", "F", "G", "H", "CH", "I", "J", "K", "L", "M", "N", "Ň", "O", "P", "R", "Ř", "S", "Š", "T", "Ť", "U", "V", "Y", "Z", "Ž"];
-            let wrongCount = correctLetters.length <= 3 ? 2 : 3;
+            // Generování "špatných" písmen
+            let wrongCount = 3; // Vždy dáme aspoň 3 navíc
             let wrongLetters = [];
 
             while(wrongLetters.length < wrongCount) {
-                let randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+                // Občas vezmeme z "tricky" seznamu, občas náhodně
+                let sourceArray = (Math.random() > 0.4) ? trickyLetters : ["A", "B", "C", "Č", "D", "E", "F", "G", "H", "CH", "I", "J", "K", "L", "M", "N", "O", "P", "R", "Ř", "S", "Š", "T", "U", "V", "Z", "Ž"];
+                let randomChar = sourceArray[Math.floor(Math.random() * sourceArray.length)];
+                
                 if (!correctLetters.includes(randomChar) && !wrongLetters.includes(randomChar)) {
                     wrongLetters.push(randomChar);
                 }
@@ -300,12 +408,14 @@
             poolLetters.sort(() => Math.random() - 0.5);
 
             renderGame();
-            speakWord();
+            // Automaticky přehraje slovo na začátku kola (s mírným zpožděním)
+            setTimeout(speakWord, 500);
         }
 
         function renderGame() {
-            bouquetPreviewEl.textContent = collectedFlowers.join(" ");
+            bouquetPreviewEl.textContent = collectedFlowers.length > 0 ? collectedFlowers.join(" ") : "Zatím prázdno";
 
+            // Vykreslení slotů
             slotContainerEl.innerHTML = "";
             currentSlots.forEach((tileObj, index) => {
                 const slot = document.createElement('div');
@@ -313,13 +423,14 @@
                 if (tileObj) {
                     slot.classList.add('filled');
                     slot.textContent = tileObj.char;
-                    slot.onclick = () => removeFromSlot(index);
-                } else {
-                    slot.textContent = "";
+                    slot.addEventListener('pointerdown', () => {
+                        if(!isProcessing) removeFromSlot(index);
+                    });
                 }
                 slotContainerEl.appendChild(slot);
             });
 
+            // Vykreslení písmen
             poolContainerEl.innerHTML = "";
             poolLetters.forEach((tileObj) => {
                 const tile = document.createElement('div');
@@ -329,7 +440,14 @@
                 if (tileObj.used) {
                     tile.classList.add('used');
                 } else {
-                    tile.onclick = () => selectTile(tileObj.id);
+                    tile.addEventListener('pointerdown', function() {
+                        if(isProcessing) return;
+                        this.classList.add('clicked');
+                        setTimeout(() => {
+                            this.classList.remove('clicked');
+                            selectTile(tileObj.id);
+                        }, 100);
+                    });
                 }
                 poolContainerEl.appendChild(tile);
             });
@@ -340,7 +458,7 @@
                 window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(activeWord);
                 utterance.lang = 'cs-CZ';
-                utterance.rate = 0.75;
+                utterance.rate = 0.8; // Zpomaleno pro děti
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -372,13 +490,17 @@
         }
 
         function checkAnswer() {
+            isProcessing = true; // Zámek
             let formedWord = currentSlots.map(s => s ? s.char : '').join('');
             let expectedWord = parseWordIntoLetters(activeWord).join('');
 
             if (formedWord === expectedWord) {
+                messageEl.style.color = "var(--success)";
                 messageEl.textContent = "Správně! Utrhla jsi kytičku! 🌸";
+                
                 let randomFlower = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
                 collectedFlowers.push(randomFlower);
+                renderGame(); // Aktualizuje puget hned
 
                 setTimeout(() => {
                     if (currentRound < totalRounds) {
@@ -389,21 +511,25 @@
                     }
                 }, 1200);
             } else {
-                messageEl.style.color = '#e03131';
-                messageEl.textContent = "Takhle to úplně nesedí, zkus to upravit! 🙈";
+                messageEl.style.color = "var(--error)";
+                messageEl.textContent = "Takhle to není, zkus to opravit! 🙈";
+                slotContainerEl.classList.add('wrong');
+                
                 setTimeout(() => {
-                    messageEl.style.color = '#2b8a3e';
-                    messageEl.textContent = "";
-                }, 1500);
+                    slotContainerEl.classList.remove('wrong');
+                    messageEl.style.color = "var(--primary)";
+                    messageEl.textContent = "Zkus to znovu";
+                    isProcessing = false;
+                }, 1200);
             }
         }
 
         function showFinalVictory() {
             overlayEl.classList.remove('hidden');
-            overlayTitleEl.textContent = "🏆 Úžasné! Máš hotový puget!";
-            overlayTextEl.textContent = `Zvládla jsi všech ${totalRounds} kol a nasbírala nádherné kytičky!`;
+            overlayTitleEl.textContent = "🏆 Nádhera!";
+            overlayTextEl.textContent = `Máš hotový ten nejkrásnější puget!`;
             overlayEmojiEl.textContent = collectedFlowers.join(" ");
-            overlayBtnEl.textContent = "Hrát znovu";
+            overlayBtnEl.textContent = "Utrhnout další puget";
         }
     </script>
 
