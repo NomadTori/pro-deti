@@ -4,97 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diančiny hrátky</title>
+    <!-- Moderní zaoblený font ideální pro děti a výuku čtení -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            text-align: center;
+        :root {
+            --bg-top: #ff9a9e;
+            --bg-bottom: #fecfef;
+            --text-main: #2b2b2b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            min-height: 90vh;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             user-select: none;
+            overflow-x: hidden;
+            padding: 20px;
+            position: relative;
         }
+
+        /* Animované bubliny v pozadí pro oživení */
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: floatup 10s infinite ease-in;
+        }
+
+        .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { width: 80px; height: 80px; left: 30%; animation-duration: 12s; animation-delay: 2s; }
+        .bubble:nth-child(3) { width: 50px; height: 50px; left: 70%; animation-duration: 10s; animation-delay: 4s; }
+        .bubble:nth-child(4) { width: 90px; height: 90px; left: 85%; animation-duration: 14s; }
+
+        @keyframes floatup {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(360deg); opacity: 0; }
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 1;
+        }
+
         h1 {
             color: #fff;
-            font-size: 2.3rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            margin-bottom: 5px;
+            font-size: 3rem;
+            font-weight: 600;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
-        p {
-            color: #555;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            background: rgba(255,255,255,0.85);
-            padding: 8px 16px;
-            border-radius: 20px;
+
+        p.subtitle {
+            color: var(--text-main);
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px);
         }
+
         .menu-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
+            z-index: 1;
         }
+
+        /* 3D Tlačítka (Gamifikace) */
         .game-card {
-            background: white;
-            padding: 18px;
-            border-radius: 20px;
+            background: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 25px;
             text-decoration: none;
-            color: #333;
-            font-size: 1.4rem;
-            font-weight: bold;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: transform 0.1s, background-color 0.2s;
-            border: 3px solid #4dabf7;
+            gap: 15px;
+            transition: all 0.15s ease;
+            position: relative;
+            /* 3D okraj / stín dole */
+            box-shadow: 0 8px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.1);
+            border: 2px solid var(--btn-border);
         }
+
+        /* Oživení emodži při najetí */
+        .game-card span {
+            font-size: 2rem;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .game-card:hover span {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Efekt zamáčknutí tlačítka */
         .game-card:active {
-            transform: scale(0.95);
+            transform: translateY(8px);
+            box-shadow: 0 0 0 var(--btn-shadow), 0 5px 10px rgba(0,0,0,0.1);
         }
+
+        /* Barvy pro jednotlivé hry */
+        .game-card.math {
+            --btn-border: #4dabf7;
+            --btn-shadow: #228be6;
+        }
+        
         .game-card.flowers {
-            border-color: #40c057;
+            --btn-border: #69db7c;
+            --btn-shadow: #40c057;
         }
+        
         .game-card.sentences {
-            border-color: #1c7ed6;
+            --btn-border: #ffd43b;
+            --btn-shadow: #fab005;
         }
+
         .game-card.inactive {
-            border-color: #ccc;
-            opacity: 0.6;
-            color: #777;
+            --btn-border: #dee2e6;
+            --btn-shadow: #adb5bd;
+            background: #f8f9fa;
+            color: #868e96;
+            cursor: not-allowed;
         }
+
+        .game-card.inactive span {
+            filter: grayscale(100%);
+            opacity: 0.6;
+        }
+
+        .game-card.inactive:active {
+            transform: none;
+            box-shadow: 0 8px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Místo pro text "Brzy..." */
+        .badge {
+            margin-left: auto;
+            background: #adb5bd;
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>💖 Diančiny hrátky 💖</h1>
-    <p>Vyber si, co budeme hrát:</p>
+    <!-- Dekorační bubliny -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="header-container">
+        <h1>💖 Diančiny hrátky 💖</h1>
+        <p class="subtitle">Vyber si, co budeme hrát:</p>
+    </div>
 
     <div class="menu-container">
-        <!-- Aktivní hra - Počítání -->
-        <a href="pocitani.html" class="game-card">
+        <!-- Počítání -->
+        <a href="pocitani.html" class="game-card math">
             <span>✈️</span> Letecká pošta
         </a>
 
-        <!-- Aktivní hra - Trhání kytek -->
+        <!-- Trhání kytek -->
         <a href="kytky.html" class="game-card flowers">
             <span>🌷</span> Trhání kytek
         </a>
 
-        <!-- Aktivní hra - Pytel plný slov -->
+        <!-- Pytel plný slov -->
         <a href="vety.html" class="game-card sentences">
             <span>🎒</span> Pytel plný slov
         </a>
 
-        <!-- Místo pro budoucí hru -->
+        <!-- Neaktivní hra -->
         <a href="#" class="game-card inactive" onclick="alert('Tato hra se teprve chystá! 🚀'); return false;">
-            <span>🔤</span> Písmenka (Brzy...)
+            <span>🔤</span> Písmenka
+            <span class="badge">Brzy</span>
         </a>
     </div>
 
